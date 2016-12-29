@@ -1,3 +1,5 @@
+//Thomas Swinicki
+
 import java.awt.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,40 +20,51 @@ public class Calculator extends JFrame{
 	
 	private void initUI(){
 		setTitle("Grade Calculator");
+		
+		//these next two lines create the icon
 		ImageIcon calcIcon = new ImageIcon("calculator icon.png");
-		setIconImage(calcIcon.getImage());         //these two lines create the icon
+		setIconImage(calcIcon.getImage());      
+		
+		//configuring size of window
 		setSize(600,600);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		
+		//adds instructions for the calculator
 		JLabel descript = new JLabel("Please enter your currents grades and their respecitve" 
 				+ " weight percentages.");
 		
+		//add label and text field where the user will input grades
 		JTextField grade1 = new JTextField(5);
 		JLabel grade_lbl = new JLabel();
+		grade1.getDocument().addDocumentListener(new MyDocumentListener());
 		
-		
-		createLayout(descript,grade1, grade_lbl);
+		//create layout for the GUI
+		createLayout(descript, grade1, grade_lbl);
 		
 	}
 	
+	//The class that will allow for editing of the text field
 	private class MyDocumentListener implements DocumentListener {
 
         private String text;
 
+        @Override
         public void insertUpdate(DocumentEvent e) {
             updateLabel(e);
         }
 
-        
+        @Override
         public void removeUpdate(DocumentEvent e) {
             updateLabel(e);
         }
 
-       
+       @Override
         public void changedUpdate(DocumentEvent e) {
         }
 
+       /* only method we are interested in for the purposes of this program, which are to
+       submit different grades */
         private void updateLabel(DocumentEvent e) {
 
             Document doc = e.getDocument();
