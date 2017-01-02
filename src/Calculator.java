@@ -1,18 +1,9 @@
 //Thomas Swinicki
 
 import java.awt.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
 public class Calculator extends JFrame{
-
-	private JLabel grade_lbl;
 	
 	public Calculator(){
 		initUI();
@@ -34,52 +25,19 @@ public class Calculator extends JFrame{
 		JLabel descript = new JLabel("Please enter your currents grades and their respecitve" 
 				+ " weight percentages.");
 		
-		//add label and text field where the user will input grades
+		//add text field where the user will input grades and percentages
 		JTextField grade1 = new JTextField(5);
-		JLabel grade_lbl = new JLabel();
-		grade1.getDocument().addDocumentListener(new MyDocumentListener());
+		JTextField percent1 = new JTextField(5);
+
+		//labels for where the grades and percentages go
+		JLabel grades =  new JLabel("Grades");
+		grades.setFont(new Font("Serif", Font.PLAIN, 14));
+		JLabel percentages = new JLabel("Percentage");
 		
 		//create layout for the GUI
-		createLayout(descript, grade1, grade_lbl);
+		createLayout(descript, grades, grade1, percentages, percent1);
 		
 	}
-	
-	//The class that will allow for editing of the text field
-	private class MyDocumentListener implements DocumentListener {
-
-        private String text;
-
-        @Override
-        public void insertUpdate(DocumentEvent e) {
-            updateLabel(e);
-        }
-
-        @Override
-        public void removeUpdate(DocumentEvent e) {
-            updateLabel(e);
-        }
-
-       @Override
-        public void changedUpdate(DocumentEvent e) {
-        }
-
-       /* only method we are interested in for the purposes of this program, which are to
-       submit different grades */
-        private void updateLabel(DocumentEvent e) {
-
-            Document doc = e.getDocument();
-            int len = doc.getLength();
-
-            try {
-                text = doc.getText(0, len);
-            } catch (BadLocationException ex) {
-                Logger.getLogger(Calculator.class.getName()).log(
-                        Level.SEVERE, null, ex);
-            }
-            grade_lbl.setText(text);
-
-        }
-    }
 	
 	public static void main(String[] args){
 		EventQueue.invokeLater(() -> {
@@ -88,6 +46,7 @@ public class Calculator extends JFrame{
         });
 	}
 	
+	//may consider using a different layout for program/ need to learn more about GroupLayout
 	public void createLayout(JComponent... arg) {
 		Container pane = getContentPane();
 		GroupLayout g1 = new GroupLayout(pane);
@@ -96,11 +55,15 @@ public class Calculator extends JFrame{
 		g1.setAutoCreateContainerGaps(true);
 		
 		g1.setHorizontalGroup(g1.createSequentialGroup().addComponent(arg[0]).addComponent(arg[1])
+				.addComponent(arg[2]).addComponent(arg[3]).addComponent(arg[4])
                 .addGap(250));
 		
-		g1.setVerticalGroup(g1.createSequentialGroup().addComponent(arg[0], GroupLayout.DEFAULT_SIZE, 
-                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+		g1.setVerticalGroup(g1.createSequentialGroup().addComponent(arg[0])
         .addComponent(arg[1])
+        .addComponent(arg[2], GroupLayout.DEFAULT_SIZE, 
+                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+        .addComponent(arg[3]).addComponent(arg[4], GroupLayout.DEFAULT_SIZE, 
+                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
         .addGap(150));
 		
 		pack();
