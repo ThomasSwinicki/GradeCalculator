@@ -3,6 +3,9 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,9 +19,28 @@ import net.miginfocom.swing.MigLayout;
 
 public class Calculator extends JFrame implements ActionListener{
 	
-	private JTextField grade1;
+	private JTextField grade1;      //inputs for grades and percentages for user
 	private JTextField percent1;
-	private JLabel finalGrade;
+	private JTextField grade2;
+	private JTextField percent2;
+	private JTextField grade3;
+	private JTextField percent3;
+	private JTextField grade4;
+	private JTextField percent4;
+	private JTextField grade5;
+	private JTextField percent5;
+	private ArrayList<JTextField> gs = new ArrayList<JTextField>(); //arrayList of grades
+	private ArrayList<JTextField> ps = new ArrayList<JTextField>(); //arrayList of percentages
+	private JLabel finalGrade = new JLabel();//label that will display the final grade
+	private JLabel neededGrade = new JLabel();//label that will display the grade needed to get 
+	//the a desired grade defined by user
+	private Container pane = getContentPane();
+	private JLabel desiredGrade; //prompt for the grade user wishes to obtain
+	private JTextField dGrade; //input for desired grade
+	private JLabel estimatedGrade; //prompt for grade user estimates they will get
+	private JTextField eGrade; //input for estimated grade
+	private JLabel dGradeOutput = new JLabel();
+	private JLabel eGradeOutput = new JLabel();
 	
 	public Calculator(){
 		initUI();
@@ -43,37 +65,120 @@ public class Calculator extends JFrame implements ActionListener{
 		//add text field where the user will input grades and percentages
 		grade1 = new JTextField(5);
 		percent1 = new JTextField(5);
-		
-		//DocumentListeners are created so that the JLabel for the final grade can be 
-		//updated using the changes from the grade and percentage text fields
-		
-		//try without documentlisteners, it should work, need to fix null pointer exception
-		//grade1.getDocument().addDocumentListener(new MyDocumentListener());
-		//percent1.getDocument().addDocumentListener(new MyDocumentListener());
+		grade2 = new JTextField(5);
+		percent2 = new JTextField(5);
+		grade3 = new JTextField(5);
+		percent3 = new JTextField(5);
+		grade4 = new JTextField(5);
+		percent4 = new JTextField(5);
+		grade5 = new JTextField(5);
+		percent5 = new JTextField(5);
+		gs.add(grade1);
+		gs.add(grade2);
+		gs.add(grade3);
+		gs.add(grade4);
+		gs.add(grade5);
+		ps.add(percent1);
+		ps.add(percent2);
+		ps.add(percent3);
+		ps.add(percent4);
+		ps.add(percent5);
 
 		//labels for where the grades and percentages go
 		JLabel grades =  new JLabel("Grades");
 		grades.setFont(new Font("Serif", Font.PLAIN, 14));
 		JLabel percentages = new JLabel("Percentage");
+		percentages.setFont(new Font("Serif", Font.PLAIN, 14));
 		
+		//button to calculate grades
 		JButton calculate = new JButton("Calculate");
 		calculate.addActionListener(this);
 		
-		finalGrade = new JLabel("test");
+		//button to add grades
+		JButton addGrade = new JButton("Add grade");
+		addGrade.addActionListener(new AddGrade());
+		
+		//desired and estimated grade labels/text fields
+		desiredGrade= new JLabel("Input the overrall grade you wish to obtain:");
+		estimatedGrade= new JLabel("Input a grade to represent the remaining percentage to see"
+				+ " its impact on your final grade:");
+		dGrade = new JTextField(5);
+		eGrade = new JTextField(5);
 		
 		//create layout for the GUI
-		createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade);
+		createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade,
+				neededGrade, grade2, percent2, grade3, percent3, grade4, percent4,
+				grade5, percent5, desiredGrade, dGrade, estimatedGrade, eGrade, dGradeOutput,
+				eGradeOutput);
 	
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e){
+		/*this method will calculate the grade of the user based on the percentages and 
+		 *grades that were input... it will also tell the use what percentage of their grade
+		 *remains and what they need to score on the remaining percentage to obtain a desired
+		 *grade which they input*/
+		double fGrade = 0;
+		double totalPerc = 0;
+		for(int i = 0; i < gs.size(); i++){
+			if((!gs.get(i).equals(null) || gs.get(i).equals("")) && 
+			(!ps.get(i).equals(null) || ps.get(i).equals("")) ){
+				float grade = 0;
+				double perc = 0;
+				try{
+				grade = Float.parseFloat(gs.get(i).getText());
+				perc = ((double) Integer.parseInt(ps.get(i).getText()) /100);
+				}
+				catch(NumberFormatException n){
+					grade = 0;
+					perc = 0;
+				}
+				fGrade += grade * perc;
+				totalPerc += perc * 100;
+			}
+			
+		}
+		double remainingPerc = 100-totalPerc;
 		
-		int g1 = Integer.parseInt(grade1.getText());
-		double p1 = (double) Integer.parseInt(percent1.getText());
-		double fGrade = g1 * p1;
-		String result = String.valueOf(fGrade);
-		finalGrade.setText(result);
+		Float dGradeFloat;
+		try{
+			dGradeFloat = Float.parseFloat(dGrade.getText());
+		}
+		catch(NumberFormatException m){
+			dGradeFloat = null;
+		}
+		Float eGradeFloat;
+		try{
+			eGradeFloat = Float.parseFloat(eGrade.getText());
+		}
+		catch(NumberFormatException t){
+			eGradeFloat = null;
+		}
+		
+		NumberFormat nFormat = new DecimalFormat("#0.00");//will make grade go to 100ths
+		finalGrade.setText("Your current grade is " + nFormat.format(fGrade) + 
+				" and makes up " + (int)totalPerc + "% of your grade.");
+		
+		if(dGradeFloat != null){
+			Float neededGrade = null;
+			if(remainingPerc != 0)
+				neededGrade = (dGradeFloat - Float.parseFloat(nFormat.format(fGrade))) / 
+				(Float.parseFloat(nFormat.format(remainingPerc))/100);
+			dGradeOutput.setText("You need to receive a grade of " + neededGrade + " on the"
+		+ " remaining " + remainingPerc+ "% of your grade for the final grade to be " + dGradeFloat);
+		}
+		if(eGradeFloat != null){
+			Float eFinalGrade = null;
+			if(remainingPerc != 0)
+				eFinalGrade = Float.parseFloat(nFormat.format(fGrade)) + (eGradeFloat *
+						(Float.parseFloat(nFormat.format(remainingPerc))/100));
+			eGradeOutput.setText("If you receive a " + eGradeFloat + " on the remaining "
+					+ remainingPerc + "% of your grade, you will receive a final grade of " +
+					eFinalGrade);
+		}
+		
+		pack();
 	}
 	
     public static void main(String[] args){
@@ -82,6 +187,13 @@ public class Calculator extends JFrame implements ActionListener{
     		calc.setVisible(true);
         });
 	}
+    
+    public class AddGrade implements ActionListener{
+    	@Override
+    	public void actionPerformed(ActionEvent e){
+    		
+    	}
+    }
 	
 	
 	//may consider using a different layout for program/need to learn more about GroupLayout
@@ -125,18 +237,35 @@ public class Calculator extends JFrame implements ActionListener{
 	
 	//layout using MigLayout
 	public void createLayout(JComponent... arg){
-		Container pane = getContentPane();
+		//Container pane = getContentPane();
 		MigLayout m1 = new MigLayout("wrap 2");
 		pane.setLayout(m1);
 		
-		//for quick reference on which arguments correspond to which component
-		//createLayout(descript, grades, grade1, percentages, percent1, calculate);
+		//for quick reference on which indices correspond to which component
+		//createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade,
+		//neededGrade, grade2, percent2, grade3, percent3, grade4, percent4,
+		//grade5, percent5, desiredGrade, dGrade, estimatedGrade, eGrade, dGradeOutput,
+		//eGradeOutput);
 		pane.add(arg[0], "wrap");
 		pane.add(arg[1], "gapleft 300");
 		pane.add(arg[3], "gapright 300");
 		pane.add(arg[2], "gapleft 300");
 		pane.add(arg[4], "gapright 300");
+		pane.add(arg[8], "gapleft 300");
+		pane.add(arg[9], "gapright 300");
+		pane.add(arg[10], "gapleft 300");
+		pane.add(arg[11], "gapright 300");
+		pane.add(arg[12], "gapleft 300");
+		pane.add(arg[13], "gapright 300");
+		pane.add(arg[14], "gapleft 300");
+		pane.add(arg[15], "gapright 300");
+		pane.add(arg[16], "gaptop 50px");
+		pane.add(arg[17]);
+		pane.add(arg[18]);
+		pane.add(arg[19]);
 		pane.add(arg[6], "wrap");
+		pane.add(arg[20], "wrap");
+		pane.add(arg[21], "wrap");
 		pane.add(arg[5], "align right");
 		
 		pack();
