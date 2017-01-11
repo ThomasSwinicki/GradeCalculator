@@ -246,7 +246,6 @@ public class Calculator extends JFrame implements ActionListener{
 	
 	//layout using MigLayout
 	public void createLayout(JComponent... arg){
-		//Container pane = getContentPane();
 		MigLayout m1 = new MigLayout("wrap 2");
 		pane.setLayout(m1);
 		
