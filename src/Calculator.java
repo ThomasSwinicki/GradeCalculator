@@ -41,6 +41,7 @@ public class Calculator extends JFrame implements ActionListener{
 	private JTextField eGrade; //input for estimated grade
 	private JLabel dGradeOutput = new JLabel();
 	private JLabel eGradeOutput = new JLabel();
+	private Integer curNumGradeRows = 7;
 	
 	public Calculator(){
 		initUI();
@@ -109,7 +110,7 @@ public class Calculator extends JFrame implements ActionListener{
 		createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade,
 				neededGrade, grade2, percent2, grade3, percent3, grade4, percent4,
 				grade5, percent5, desiredGrade, dGrade, estimatedGrade, eGrade, dGradeOutput,
-				eGradeOutput);
+				eGradeOutput, addGrade);
 	
 	}
 	
@@ -122,8 +123,7 @@ public class Calculator extends JFrame implements ActionListener{
 		double fGrade = 0;
 		double totalPerc = 0;
 		for(int i = 0; i < gs.size(); i++){
-			if((!gs.get(i).equals(null) || gs.get(i).equals("")) && 
-			(!ps.get(i).equals(null) || ps.get(i).equals("")) ){
+			if(!gs.get(i).equals(null)  && !ps.get(i).equals(null) ){
 				float grade = 0;
 				double perc = 0;
 				try{
@@ -141,6 +141,7 @@ public class Calculator extends JFrame implements ActionListener{
 		}
 		double remainingPerc = 100-totalPerc;
 		
+		//create floats for desired and estimated grades
 		Float dGradeFloat;
 		try{
 			dGradeFloat = Float.parseFloat(dGrade.getText());
@@ -160,6 +161,7 @@ public class Calculator extends JFrame implements ActionListener{
 		finalGrade.setText("Your current grade is " + nFormat.format(fGrade) + 
 				" and makes up " + (int)totalPerc + "% of your grade.");
 		
+		//get the desired and estimated grade output if there is an input for them
 		if(dGradeFloat != null){
 			Float neededGrade = null;
 			if(remainingPerc != 0)
@@ -191,7 +193,14 @@ public class Calculator extends JFrame implements ActionListener{
     public class AddGrade implements ActionListener{
     	@Override
     	public void actionPerformed(ActionEvent e){
-    		
+    		JTextField newG = new JTextField(5);
+    		JTextField newP = new JTextField(5);
+    		pane.add(newG, "cell 0 " + curNumGradeRows.toString());
+    		pane.add(newP, "cell 1 " + curNumGradeRows.toString());
+    		curNumGradeRows++;
+    		gs.add(newG);
+    		ps.add(newP);
+    		pack();
     	}
     }
 	
@@ -245,7 +254,7 @@ public class Calculator extends JFrame implements ActionListener{
 		//createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade,
 		//neededGrade, grade2, percent2, grade3, percent3, grade4, percent4,
 		//grade5, percent5, desiredGrade, dGrade, estimatedGrade, eGrade, dGradeOutput,
-		//eGradeOutput);
+		//eGradeOutput, addGrade);
 		pane.add(arg[0], "wrap");
 		pane.add(arg[1], "gapleft 300");
 		pane.add(arg[3], "gapright 300");
@@ -259,6 +268,7 @@ public class Calculator extends JFrame implements ActionListener{
 		pane.add(arg[13], "gapright 300");
 		pane.add(arg[14], "gapleft 300");
 		pane.add(arg[15], "gapright 300");
+		pane.add(arg[22], "wrap");
 		pane.add(arg[16], "gaptop 50px");
 		pane.add(arg[17]);
 		pane.add(arg[18]);
@@ -266,7 +276,7 @@ public class Calculator extends JFrame implements ActionListener{
 		pane.add(arg[6], "wrap");
 		pane.add(arg[20], "wrap");
 		pane.add(arg[21], "wrap");
-		pane.add(arg[5], "align right");
+		pane.add(arg[5], "center");
 		
 		pack();
 	}
