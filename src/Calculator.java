@@ -6,17 +6,14 @@ import java.awt.event.ActionListener;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
 import net.miginfocom.swing.MigLayout;
 
+@SuppressWarnings("serial")
 public class Calculator extends JFrame implements ActionListener{
 	
 	private JTextField grade1;      //inputs for grades and percentages for user
@@ -42,6 +39,9 @@ public class Calculator extends JFrame implements ActionListener{
 	private JLabel dGradeOutput = new JLabel();
 	private JLabel eGradeOutput = new JLabel();
 	private Integer curNumGradeRows = 7;
+	//list containing booleans that are true if the text fields for grades/percentages are empty
+	private ArrayList<Boolean> gsBools = new ArrayList<Boolean>(); 
+	private ArrayList<Boolean> psBools = new ArrayList<Boolean>();
 	
 	public Calculator(){
 		initUI();
@@ -84,6 +84,15 @@ public class Calculator extends JFrame implements ActionListener{
 		ps.add(percent3);
 		ps.add(percent4);
 		ps.add(percent5);
+		
+		for(JTextField j : gs){
+			j.getDocument().addDocumentListener(new MyGradeDocumentListener(j));
+			gsBools.add(true);
+		}
+		for(JTextField j: ps){
+			j.getDocument().addDocumentListener(new MyPercentDocumentListener(j));
+			psBools.add(true);
+		}
 
 		//labels for where the grades and percentages go
 		JLabel grades =  new JLabel("Grades");
@@ -106,12 +115,77 @@ public class Calculator extends JFrame implements ActionListener{
 		dGrade = new JTextField(5);
 		eGrade = new JTextField(5);
 		
+		JButton clearBtn = new JButton("Clear");
+		clearBtn.addActionListener(new Clear());
+		
 		//create layout for the GUI
 		createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade,
 				neededGrade, grade2, percent2, grade3, percent3, grade4, percent4,
 				grade5, percent5, desiredGrade, dGrade, estimatedGrade, eGrade, dGradeOutput,
-				eGradeOutput, addGrade);
+				eGradeOutput, addGrade, clearBtn);
 	
+	}
+	
+	private class MyGradeDocumentListener implements DocumentListener{
+
+		private JTextField jtf;
+		
+		public MyGradeDocumentListener(JTextField j){
+			jtf = j;
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			change();
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			change();
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			change();
+		}
+		
+		public void change(){
+			if(!jtf.getText().equals("")){
+				gsBools.set(gs.indexOf(jtf) , false);
+			}
+			else 
+				gsBools.set(gs.indexOf(jtf) , true);
+		}
+	}
+	
+	private class MyPercentDocumentListener implements DocumentListener{
+
+		private JTextField jtf;
+		
+		public MyPercentDocumentListener(JTextField j){
+			jtf = j;
+		}
+		@Override
+		public void changedUpdate(DocumentEvent e) {
+			change();
+		}
+
+		@Override
+		public void insertUpdate(DocumentEvent e) {
+			change();
+		}
+
+		@Override
+		public void removeUpdate(DocumentEvent e) {
+			change();
+		}
+		
+		public void change(){
+			if(!jtf.getText().equals("")){
+				psBools.set(ps.indexOf(jtf) , false);
+			}
+			else 
+				psBools.set(ps.indexOf(jtf) , true);
+		}
 	}
 	
 	@Override
@@ -123,7 +197,7 @@ public class Calculator extends JFrame implements ActionListener{
 		double fGrade = 0;
 		double totalPerc = 0;
 		for(int i = 0; i < gs.size(); i++){
-			if(!gs.get(i).equals(null)  && !ps.get(i).equals(null) ){
+			if(gsBools.get(i) == false  && psBools.get(i) == false){
 				float grade = 0;
 				double perc = 0;
 				try{
@@ -137,6 +211,29 @@ public class Calculator extends JFrame implements ActionListener{
 				fGrade += grade * perc;
 				totalPerc += perc * 100;
 			}
+			else if(gsBools.get(i) == true && psBools.get(i) == false){
+				JOptionPane.showMessageDialog(this, "Please input all grades", "Error", 
+						JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			else if(gsBools.get(i) == false && psBools.get(i) == true){
+				JOptionPane.showMessageDialog(this, "Please input all percentages" , "Error",
+						JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			
+			/*else if(gs.get(i).getText().isEmpty() && !ps.get(i).getText().isEmpty()){
+				//alert user to input all grades
+				JOptionPane.showMessageDialog(this, "Please input all grades", "Error", 
+						JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}
+			else if(!gs.get(i).getText().isEmpty() && ps.get(i).getText().isEmpty()){
+				//alert user to input all percentages
+				JOptionPane.showMessageDialog(this, "Please input all percentages" , "Error",
+						JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}*/
 			
 		}
 		double remainingPerc = 100-totalPerc;
@@ -168,7 +265,8 @@ public class Calculator extends JFrame implements ActionListener{
 				neededGrade = (dGradeFloat - Float.parseFloat(nFormat.format(fGrade))) / 
 				(Float.parseFloat(nFormat.format(remainingPerc))/100);
 			dGradeOutput.setText("You need to receive a grade of " + neededGrade + " on the"
-		+ " remaining " + remainingPerc+ "% of your grade for the final grade to be " + dGradeFloat);
+		+ " remaining " + remainingPerc+ "% of your grade for the final grade to be " + dGradeFloat
+		+ ".");
 		}
 		if(eGradeFloat != null){
 			Float eFinalGrade = null;
@@ -177,7 +275,7 @@ public class Calculator extends JFrame implements ActionListener{
 						(Float.parseFloat(nFormat.format(remainingPerc))/100));
 			eGradeOutput.setText("If you receive a " + eGradeFloat + " on the remaining "
 					+ remainingPerc + "% of your grade, you will receive a final grade of " +
-					eFinalGrade);
+					eFinalGrade + ".");
 		}
 		
 		pack();
@@ -195,54 +293,30 @@ public class Calculator extends JFrame implements ActionListener{
     	public void actionPerformed(ActionEvent e){
     		JTextField newG = new JTextField(5);
     		JTextField newP = new JTextField(5);
-    		pane.add(newG, "cell 0 " + curNumGradeRows.toString());
-    		pane.add(newP, "cell 1 " + curNumGradeRows.toString());
+    		newG.getDocument().addDocumentListener(new MyGradeDocumentListener(newG));
+    		newP.getDocument().addDocumentListener(new MyPercentDocumentListener(newP));
+    		pane.add(newG, "cell 0 " + curNumGradeRows.toString() + ",  gapleft 300" );
+    		pane.add(newP, "cell 1 " + curNumGradeRows.toString() );
     		curNumGradeRows++;
     		gs.add(newG);
     		ps.add(newP);
+    		gsBools.add(true);
+    		psBools.add(true);
     		pack();
     	}
     }
-	
-	
-	//may consider using a different layout for program/need to learn more about GroupLayout
-	/*public void createLayout(JComponent... arg) {
-		Container pane = getContentPane();
-		GroupLayout g1 = new GroupLayout(pane);
-		pane.setLayout(g1);
-		
-		g1.setAutoCreateGaps(true);
-		g1.setAutoCreateContainerGaps(true);
-		
-		//for quick reference on which arguments correspond to which component
-		//createLayout(descript, grades, grade1, percentages, percent1, calculate);
-		
-		g1.setHorizontalGroup(
-				g1.createSequentialGroup()
-					.addComponent(arg[0])
-					.addComponent(arg[1])
-					.addGroup(g1.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(arg[2]))
-					.addComponent(arg[3])
-					.addGroup(g1.createParallelGroup(GroupLayout.Alignment.LEADING)
-						.addComponent(arg[4]))
-		);
-		
-		g1.setVerticalGroup(
-				g1.createSequentialGroup()
-					.addComponent(arg[0])
-					.addGroup(g1.createParallelGroup(GroupLayout.Alignment.BASELINE)
-							.addComponent(arg[1])
-							.addComponent(arg[3]))
-					.addGroup(g1.createParallelGroup(GroupLayout.Alignment.BASELINE)
-							.addComponent(arg[2],GroupLayout.DEFAULT_SIZE, 
-				                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addComponent(arg[4],GroupLayout.DEFAULT_SIZE, 
-				                GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-		);
-		
-		pack();
-	}*/
+    
+    private class Clear implements ActionListener{
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			for(JTextField g : gs)
+				g.setText("");
+			for(JTextField p: ps)
+				p.setText("");
+		}
+    	
+    }
 	
 	//layout using MigLayout
 	public void createLayout(JComponent... arg){
@@ -253,8 +327,8 @@ public class Calculator extends JFrame implements ActionListener{
 		//createLayout(descript, grades, grade1, percentages, percent1, calculate, finalGrade,
 		//neededGrade, grade2, percent2, grade3, percent3, grade4, percent4,
 		//grade5, percent5, desiredGrade, dGrade, estimatedGrade, eGrade, dGradeOutput,
-		//eGradeOutput, addGrade);
-		pane.add(arg[0], "wrap");
+		//eGradeOutput, addGrade, clearBtn);
+		pane.add(arg[0], "wrap, gap 5");
 		pane.add(arg[1], "gapleft 300");
 		pane.add(arg[3], "gapright 300");
 		pane.add(arg[2], "gapleft 300");
@@ -267,15 +341,16 @@ public class Calculator extends JFrame implements ActionListener{
 		pane.add(arg[13], "gapright 300");
 		pane.add(arg[14], "gapleft 300");
 		pane.add(arg[15], "gapright 300");
-		pane.add(arg[22], "wrap");
-		pane.add(arg[16], "gaptop 50px");
-		pane.add(arg[17]);
-		pane.add(arg[18]);
-		pane.add(arg[19]);
-		pane.add(arg[6], "wrap");
-		pane.add(arg[20], "wrap");
-		pane.add(arg[21], "wrap");
-		pane.add(arg[5], "center");
+		pane.add(arg[5], "center, south , gap 350 350 5 5"); //calculate button 
+		pane.add(arg[21], "wrap, south, gaptop 10, gap 5"); //eGradeOutput label
+		pane.add(arg[20], "wrap, south, gaptop 10, gap 5"); //dGradeOutput label
+		pane.add(arg[6], "wrap, south, gaptop 10, gap 5"); //finalGrade label
+		pane.add(arg[19], "south, gap 5 750 5"); //eGrade text field
+		pane.add(arg[18], "south, gap 5"); //estimatedGrade label
+		pane.add(arg[17] ,"south, gap 5 750 5"); //dGrade text field
+		pane.add(arg[16], "south, gap 5"); //desiredGrade label
+		pane.add(arg[23], "south, gap 350 350 5"); //clear button
+		pane.add(arg[22], "wrap , alignright, south, gap 350 350 10"); //addGrade button
 		
 		pack();
 	}
