@@ -62,6 +62,7 @@ public class Calculator extends JFrame implements ActionListener{
 		//adds instructions for the calculator
 		JLabel descript = new JLabel("Please enter your currents grades and their respecitve" 
 				+ " weight percentages.");
+		descript.setFont(new Font("Serif", Font.BOLD, 14));
 		
 		//add text field where the user will input grades and percentages
 		grade1 = new JTextField(5);
@@ -96,9 +97,9 @@ public class Calculator extends JFrame implements ActionListener{
 
 		//labels for where the grades and percentages go
 		JLabel grades =  new JLabel("Grades");
-		grades.setFont(new Font("Serif", Font.PLAIN, 14));
+		grades.setFont(new Font("Serif", Font.BOLD, 14));
 		JLabel percentages = new JLabel("Percentage");
-		percentages.setFont(new Font("Serif", Font.PLAIN, 14));
+		percentages.setFont(new Font("Serif", Font.BOLD, 14));
 		
 		//button to calculate grades
 		JButton calculate = new JButton("Calculate");
@@ -112,6 +113,8 @@ public class Calculator extends JFrame implements ActionListener{
 		desiredGrade= new JLabel("Input the overrall grade you wish to obtain:");
 		estimatedGrade= new JLabel("Input a grade to represent the remaining percentage to see"
 				+ " its impact on your final grade:");
+		desiredGrade.setFont(new Font("Serif", Font.BOLD, 14));
+		estimatedGrade.setFont(new Font("Serif", Font.BOLD, 14));
 		dGrade = new JTextField(5);
 		eGrade = new JTextField(5);
 		
@@ -207,6 +210,9 @@ public class Calculator extends JFrame implements ActionListener{
 				catch(NumberFormatException n){
 					grade = 0;
 					perc = 0;
+					JOptionPane.showMessageDialog(this, "Please input numbers.", "Error", 
+							JOptionPane.INFORMATION_MESSAGE);
+					return;
 				}
 				fGrade += grade * perc;
 				totalPerc += perc * 100;
@@ -257,6 +263,7 @@ public class Calculator extends JFrame implements ActionListener{
 		NumberFormat nFormat = new DecimalFormat("#0.00");//will make grade go to 100ths
 		finalGrade.setText("Your current grade is " + nFormat.format(fGrade) + 
 				" and makes up " + (int)totalPerc + "% of your grade.");
+		finalGrade.setFont(new Font("Serif", Font.BOLD, 14));
 		
 		//get the desired and estimated grade output if there is an input for them
 		if(dGradeFloat != null){
@@ -267,6 +274,7 @@ public class Calculator extends JFrame implements ActionListener{
 			dGradeOutput.setText("You need to receive a grade of " + neededGrade + " on the"
 		+ " remaining " + remainingPerc+ "% of your grade for the final grade to be " + dGradeFloat
 		+ ".");
+			dGradeOutput.setFont(new Font("Serif", Font.BOLD, 14));
 		}
 		if(eGradeFloat != null){
 			Float eFinalGrade = null;
@@ -276,6 +284,7 @@ public class Calculator extends JFrame implements ActionListener{
 			eGradeOutput.setText("If you receive a " + eGradeFloat + " on the remaining "
 					+ remainingPerc + "% of your grade, you will receive a final grade of " +
 					eFinalGrade + ".");
+			eGradeOutput.setFont(new Font("Serif", Font.BOLD, 14));
 		}
 		
 		pack();
