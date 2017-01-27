@@ -52,7 +52,7 @@ public class Calculator extends JFrame implements ActionListener{
 		
 		//these next two lines create the icon
 		ImageIcon calcIcon = new ImageIcon("calculator icon.png");
-		setIconImage(calcIcon.getImage());      
+		setIconImage(calcIcon.getImage());
 		
 		//configuring size of window
 		setSize(600,600);
@@ -251,6 +251,10 @@ public class Calculator extends JFrame implements ActionListener{
 		}
 		catch(NumberFormatException m){
 			dGradeFloat = null;
+			JOptionPane.showMessageDialog(this, "Please input numbers", "Error", 
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
+			
 		}
 		Float eGradeFloat;
 		try{
@@ -258,6 +262,9 @@ public class Calculator extends JFrame implements ActionListener{
 		}
 		catch(NumberFormatException t){
 			eGradeFloat = null;
+			JOptionPane.showMessageDialog(this, "Please input numbers", "Error", 
+					JOptionPane.INFORMATION_MESSAGE);
+			return;
 		}
 		
 		NumberFormat nFormat = new DecimalFormat("#0.00");//will make grade go to 100ths
@@ -268,23 +275,26 @@ public class Calculator extends JFrame implements ActionListener{
 		//get the desired and estimated grade output if there is an input for them
 		if(dGradeFloat != null){
 			Float neededGrade = null;
-			if(remainingPerc != 0)
+			if(remainingPerc != 0){
 				neededGrade = (dGradeFloat - Float.parseFloat(nFormat.format(fGrade))) / 
 				(Float.parseFloat(nFormat.format(remainingPerc))/100);
-			dGradeOutput.setText("You need to receive a grade of " + neededGrade + " on the"
-		+ " remaining " + remainingPerc+ "% of your grade for the final grade to be " + dGradeFloat
-		+ ".");
-			dGradeOutput.setFont(new Font("Serif", Font.BOLD, 14));
+				dGradeOutput.setText("You need to receive a grade of " + neededGrade + " on the"
+						+ " remaining " + remainingPerc+ "% of your grade for the final grade to be " + dGradeFloat
+						+ ".");
+				dGradeOutput.setFont(new Font("Serif", Font.BOLD, 14));
+			}
+	
 		}
 		if(eGradeFloat != null){
 			Float eFinalGrade = null;
-			if(remainingPerc != 0)
+			if(remainingPerc != 0){
 				eFinalGrade = Float.parseFloat(nFormat.format(fGrade)) + (eGradeFloat *
 						(Float.parseFloat(nFormat.format(remainingPerc))/100));
-			eGradeOutput.setText("If you receive a " + eGradeFloat + " on the remaining "
+				eGradeOutput.setText("If you receive a " + eGradeFloat + " on the remaining "
 					+ remainingPerc + "% of your grade, you will receive a final grade of " +
 					eFinalGrade + ".");
-			eGradeOutput.setFont(new Font("Serif", Font.BOLD, 14));
+				eGradeOutput.setFont(new Font("Serif", Font.BOLD, 14));
+			}
 		}
 		
 		pack();
